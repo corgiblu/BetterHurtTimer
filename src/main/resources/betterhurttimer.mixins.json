@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "arekkuusu.betterhurttimer.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "BetterHurtTimer-refmap.json",
+  "target": "@env(DEFAULT)",
+  "client": [
+    "HurtCameraEffectMixin",
+    "HurtAnimationMixin"
+  ],
+  "mixins": [
+    "AttackEntityMixin",
+    "HurtTimeMixin",
+    "KnockbackMixin",
+    "DamageArmorMixin",
+    "DamageArmorMixinOverride"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "plugin": "arekkuusu.betterhurttimer.common.core.Plugin"
+}

@@ -1,60 +1,64 @@
 package arekkuusu.betterhurttimer.mixin;
 
 import arekkuusu.betterhurttimer.BHTConfig;
-import arekkuusu.betterhurttimer.api.capability.Capabilities;
-import arekkuusu.betterhurttimer.api.capability.HurtCapability;
-import net.minecraft.entity.EntityLivingBase;
+import arekkuusu.betterhurttimer.api.capability.Hurt;
+import arekkuusu.betterhurttimer.api.capability.HurtProvider;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.common.util.LazyOptional;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(EntityLivingBase.class)
+@Mixin(LivingEntity.class)
 public abstract class DamageArmorMixin {
 
     //Forge Compliant
-    @Redirect(method = "attackEntityFrom(Lnet/minecraft/util/DamageSource;F)Z", at = @At(target = "Lnet/minecraft/entity/EntityLivingBase;damageShield(F)V", value = "INVOKE"), require = 0)
-    public void damageShield(EntityLivingBase entity, float damage) {
-        HurtCapability capability = Capabilities.hurt(entity).orElse(null);
-        if (capability != null) {
-            if (capability.ticksToShieldDamage > 0) {
-                if (Double.compare(Math.max(0, capability.lastShieldDamage + BHTConfig.CONFIG.damageFrames.nextAttackDamageDifference), damage) < 0) {
-                    damageShield((float) (damage - capability.lastShieldDamage));
-                    capability.lastShieldDamage = damage;
+    @Redirect(method = "hurt", at = @At(target = "Lnet/minecraft/world/entity/LivingEntity;hurtCurrentlyUsedShield(F)V", value = "INVOKE"), require = 0)
+    public void damageShield(LivingEntity entity, float damage) {
+        LazyOptional<Hurt> optional = HurtProvider.hurt(entity);
+        if (optional.isPresent()) {
+            Hurt capability = optional.orElseThrow(UnsupportedOperationException::new);
+            if (capability.getTicksToShieldDamage() > 0) {
+                if (Double.compare(Math.max(0, capability.getLastShieldDamage() + BHTConfig.Runtime.DamageFrames.nextAttackDamageDifference), damage) < 0) {
+                    hurtCurrentlyUsedShield((float) (damage - capability.getLastShieldDamage()));
+                    capability.setLastShieldDamage((int) damage);
                 }
             } else {
-                damageShield(damage);
-                capability.lastShieldDamage = damage;
-                capability.ticksToShieldDamage = BHTConfig.CONFIG.damageFrames.shieldResistantTime;
+                hurtCurrentlyUsedShield(damage);
+                capability.setLastShieldDamage((int) damage);
+                capability.setTicksToShieldDamage(BHTConfig.Runtime.DamageFrames.shieldResistantTime);
             }
         } else {
-            damageShield(damage);
+            hurtCurrentlyUsedShield(damage);
         }
     }
 
-    @Redirect(method = "applyArmorCalculations(Lnet/minecraft/util/DamageSource;F)F", at = @At(target = "Lnet/minecraft/entity/EntityLivingBase;damageArmor(F)V", value = "INVOKE"), require = 0)
-    public void damageArmor(EntityLivingBase entity, float damage) {
-        HurtCapability capability = Capabilities.hurt(entity).orElse(null);
-        if (capability != null) {
-            if (capability.ticksToArmorDamage > 0) {
-                if (Double.compare(Math.max(0, capability.lastArmorDamage + BHTConfig.CONFIG.damageFrames.nextAttackDamageDifference), damage) < 0) {
-                    damageArmor((float) (damage - capability.lastArmorDamage));
-                    capability.lastArmorDamage = damage;
+    @Redirect(method = "getDamageAfterArmorAbsorb", at = @At(target = "Lnet/minecraft/world/entity/LivingEntity;hurtArmor(Lnet/minecraft/world/damagesource/DamageSource;F)V", value = "INVOKE"), require = 0)
+    public void damageArmor(LivingEntity entity, DamageSource source, float damage) {
+        LazyOptional<Hurt> optional = HurtProvider.hurt(entity);
+        if (optional.isPresent()) {
+            Hurt capability = optional.orElseThrow(UnsupportedOperationException::new);
+            if (capability.getTicksToArmorDamage() > 0) {
+                if (Double.compare(Math.max(0, capability.getLastArmorDamage() + BHTConfig.Runtime.DamageFrames.nextAttackDamageDifference), damage) < 0) {
+                    hurtArmor(source, (float) (damage - capability.getLastArmorDamage()));
+                    capability.setLastArmorDamage((int) damage);
                 }
             } else {
-                damageArmor(damage);
-                capability.lastArmorDamage = damage;
-                capability.ticksToArmorDamage = BHTConfig.CONFIG.damageFrames.armorResistantTime;
+                hurtArmor(source, damage);
+                capability.setLastArmorDamage((int) damage);
+                capability.setTicksToArmorDamage(BHTConfig.Runtime.DamageFrames.armorResistantTime);
             }
         } else {
-            damageArmor(damage);
+            hurtArmor(source, damage);
         }
     }
     //Forge Compliant
 
     @Shadow
-    protected abstract void damageArmor(float damage);
+    protected abstract void hurtArmor(DamageSource arg, float f);
 
     @Shadow
-    protected abstract void damageShield(float damage);
+    protected abstract void hurtCurrentlyUsedShield(float f);
 }

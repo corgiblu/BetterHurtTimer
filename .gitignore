@@ -8,7 +8,6 @@ bin
 
 # idea
 out
-classes
 *.ipr
 *.iws
 *.iml
@@ -24,10 +23,3 @@ run
 
 # Files from Forge MDK
 forge*changelog.txt
-
-# Secret files
-keystore.jks
-secrets.properties
-/src/test/
-/logs/debug.log
-/logs/latest.log
