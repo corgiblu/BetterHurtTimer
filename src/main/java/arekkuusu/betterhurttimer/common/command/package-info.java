@@ -1,7 +1,0 @@
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-package arekkuusu.betterhurttimer.common.command;
-
-import mcp.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;
