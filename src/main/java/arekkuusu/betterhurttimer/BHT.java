@@ -2,14 +2,10 @@ package arekkuusu.betterhurttimer;
 
 import arekkuusu.betterhurttimer.api.BHTAPI;
 import arekkuusu.betterhurttimer.api.capability.data.HurtSourceInfo;
-import arekkuusu.betterhurttimer.client.ClientProxy;
-import arekkuusu.betterhurttimer.common.ServerProxy;
 import arekkuusu.betterhurttimer.common.command.CommandExport;
-import arekkuusu.betterhurttimer.common.proxy.IProxy;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -28,22 +24,13 @@ public final class BHT {
     public static final String MOD_ID = "betterhurttimer";
     public static final String MOD_NAME = "Better Hurt Timer";
 
-    private static IProxy proxy;
+
     public static final Logger LOG = LogManager.getLogger(MOD_NAME);
 
-    public static IProxy getProxy() {
-        return proxy;
-    }
-
     public BHT() {
-        proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, BHTConfig.Holder.CLIENT_SPEC);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BHTConfig.Holder.COMMON_SPEC);
         MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
-        //MinecraftForge.EVENT_BUS.register(new HurtCapability.Handler());
-        //MinecraftForge.EVENT_BUS.register(new HurtProvider());
-        //MinecraftForge.EVENT_BUS.register(new HealthCapability.Handler());
-        //MinecraftForge.EVENT_BUS.register(new HealthProvider());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onModConfigEvent);
     }
 

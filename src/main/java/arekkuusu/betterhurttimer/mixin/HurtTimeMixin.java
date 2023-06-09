@@ -1,18 +1,20 @@
 package arekkuusu.betterhurttimer.mixin;
 
-import arekkuusu.betterhurttimer.BHT;
 import arekkuusu.betterhurttimer.BHTConfig;
 import arekkuusu.betterhurttimer.api.BHTAPI;
 import arekkuusu.betterhurttimer.api.capability.Hurt;
 import arekkuusu.betterhurttimer.api.capability.HurtProvider;
 import arekkuusu.betterhurttimer.api.capability.data.AttackInfo;
+import arekkuusu.betterhurttimer.client.HurtRenderer;
 import arekkuusu.betterhurttimer.common.Events;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.DistExecutor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -49,7 +51,7 @@ public abstract class HurtTimeMixin extends Entity {
             this.preAttackedAtYaw = 0;
         }
         //noinspection ConstantConditions
-        BHT.getProxy().setPreHurtTime((LivingEntity) ((Object) this));
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ()-> HurtRenderer.setPreHurtTime((LivingEntity) ((Object) this)));
         this.preDamageSource = source;
     }
 
