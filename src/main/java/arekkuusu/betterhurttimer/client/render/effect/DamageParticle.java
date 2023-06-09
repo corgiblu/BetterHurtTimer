@@ -13,7 +13,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -26,7 +26,7 @@ public class DamageParticle extends Particle {
 
     public boolean grow = true;
     public float scale;
-    public TranslatableComponent text;
+    public Component text;
     public int color;
 
     public DamageParticle(int damage, ClientLevel world, double parX, double parY, double parZ, double parMotionX, double parMotionY, double parMotionZ) {
@@ -35,7 +35,7 @@ public class DamageParticle extends Particle {
         this.scale = 1F;
         this.lifetime = 12;
         this.color = damage > 0 ? BHTConfig.Runtime.Rendering.damageColor : BHTConfig.Runtime.Rendering.healColor;
-        this.text = new TranslatableComponent(BHT.MOD_ID + ".particle", Math.abs(damage));
+        this.text = Component.translatable(BHT.MOD_ID + ".particle", Math.abs(damage));
     }
 
     @Override

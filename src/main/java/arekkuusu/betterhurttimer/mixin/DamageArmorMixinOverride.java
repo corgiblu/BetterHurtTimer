@@ -23,12 +23,12 @@ public abstract class DamageArmorMixinOverride {
             if (source.isBypassInvul()) {
                 newSource.bypassInvul();
             }
-            info.setReturnValue(applyArmorCalculations(newSource, damage));
+            info.setReturnValue(getDamageAfterArmorAbsorb(newSource, damage));
             info.cancel();
             executing = false;
         }
     }
 
     @Shadow
-    protected abstract float applyArmorCalculations(DamageSource source, float damage);
+    protected abstract float getDamageAfterArmorAbsorb(DamageSource source, float damage);
 }

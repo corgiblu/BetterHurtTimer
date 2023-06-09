@@ -2,32 +2,50 @@ package arekkuusu.betterhurttimer.client;
 
 import arekkuusu.betterhurttimer.BHT;
 import arekkuusu.betterhurttimer.BHTConfig;
-import arekkuusu.betterhurttimer.api.capability.Capabilities;
+import arekkuusu.betterhurttimer.api.capability.HealthProvider;
 import arekkuusu.betterhurttimer.client.render.effect.DamageParticle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.apache.logging.log4j.Logger;
 
 @Mod.EventBusSubscriber(modid = BHT.MOD_ID, value = Dist.CLIENT)
 public class Events {
+    private static Logger logger = BHT.LOG;
 
     @SubscribeEvent
-    public static void displayDamage(LivingEvent.LivingUpdateEvent event) {
-        LivingEntity entity = event.getEntityLiving();
-        if (!entity.level.isClientSide() || !BHTConfig.Runtime.Rendering.showDamageParticles) return;
-
-        Capabilities.health(entity).ifPresent(cap -> {
-        int currentHealth = (int) Math.ceil(entity.getHealth());
-            if (cap.health != -1 && cap.health != currentHealth) {
-                displayParticle(entity, cap.health - currentHealth);
+    public static void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
+        Entity entity = event.getObject();
+        boolean entityIsLiving = entity instanceof LivingEntity;
+        if (entityIsLiving) {
+            if (entity.getLevel().isClientSide) {
+                event.addCapability(new ResourceLocation(BHT.MOD_ID, "healthcap"), new HealthProvider());
             }
-            cap.health = currentHealth;
+            ((LivingEntity) event.getObject()).attackStrengthTicker = -1;
+        }
+    }
+
+
+    @SubscribeEvent
+    public static void displayDamage(LivingHurtEvent event) {
+        LivingEntity entity = event.getEntity(); //todo check this
+        Boolean clientSide = entity.level.isClientSide();
+        if (!clientSide || !BHTConfig.Runtime.Rendering.showDamageParticles) return;
+
+        HealthProvider.health(entity).ifPresent(cap -> {
+        int currentHealth = (int) Math.ceil(entity.getHealth());
+            if (cap.getHealth() != -1 && cap.getHealth() != currentHealth) {
+                displayParticle(entity, cap.getHealth() - currentHealth);
+            }
+            cap.setHealth(currentHealth);
         });
     }
 

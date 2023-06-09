@@ -3,7 +3,6 @@ package arekkuusu.betterhurttimer.client;
 import arekkuusu.betterhurttimer.common.proxy.IProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 

@@ -1,8 +1,6 @@
 package arekkuusu.betterhurttimer;
 
 import arekkuusu.betterhurttimer.api.BHTAPI;
-import arekkuusu.betterhurttimer.api.capability.HealthCapability;
-import arekkuusu.betterhurttimer.api.capability.HurtCapability;
 import arekkuusu.betterhurttimer.api.capability.data.HurtSourceInfo;
 import arekkuusu.betterhurttimer.client.ClientProxy;
 import arekkuusu.betterhurttimer.common.ServerProxy;
@@ -10,7 +8,6 @@ import arekkuusu.betterhurttimer.common.command.CommandExport;
 import arekkuusu.betterhurttimer.common.proxy.IProxy;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -43,19 +40,15 @@ public final class BHT {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, BHTConfig.Holder.CLIENT_SPEC);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BHTConfig.Holder.COMMON_SPEC);
         MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
-        MinecraftForge.EVENT_BUS.addListener(this::registerCaps);
-        MinecraftForge.EVENT_BUS.register(new HurtCapability.Handler());
-        MinecraftForge.EVENT_BUS.register(new HealthCapability.Handler());
+        //MinecraftForge.EVENT_BUS.register(new HurtCapability.Handler());
+        //MinecraftForge.EVENT_BUS.register(new HurtProvider());
+        //MinecraftForge.EVENT_BUS.register(new HealthCapability.Handler());
+        //MinecraftForge.EVENT_BUS.register(new HealthProvider());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onModConfigEvent);
     }
 
     public void registerCommands(RegisterCommandsEvent event) {
         CommandExport.register(event.getDispatcher());
-    }
-
-    public void registerCaps(RegisterCapabilitiesEvent event) {
-        event.register(HurtCapability.class);
-        event.register(HealthCapability.class);
     }
 
     public void onModConfigEvent(ModConfigEvent event) {

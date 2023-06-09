@@ -3,8 +3,8 @@ package arekkuusu.betterhurttimer.mixin;
 import arekkuusu.betterhurttimer.BHT;
 import arekkuusu.betterhurttimer.BHTConfig;
 import arekkuusu.betterhurttimer.api.BHTAPI;
-import arekkuusu.betterhurttimer.api.capability.Capabilities;
-import arekkuusu.betterhurttimer.api.capability.HurtCapability;
+import arekkuusu.betterhurttimer.api.capability.Hurt;
+import arekkuusu.betterhurttimer.api.capability.HurtProvider;
 import arekkuusu.betterhurttimer.api.capability.data.AttackInfo;
 import arekkuusu.betterhurttimer.common.Events;
 import net.minecraft.world.damagesource.DamageSource;
@@ -57,10 +57,10 @@ public abstract class HurtTimeMixin extends Entity {
     public int attackResistantOverride(LivingEntity target, DamageSource source) {
         if (Events.isAttack(this.preDamageSource)) {
             Entity attacker = this.preDamageSource.getEntity();
-            LazyOptional<HurtCapability> optional = Capabilities.hurt(attacker);
+            LazyOptional<Hurt> optional = HurtProvider.hurt(attacker);
             if (optional.isPresent()) {
-                HurtCapability capability = optional.orElseThrow(UnsupportedOperationException::new);
-                final AttackInfo attackInfo = capability.meleeMap.computeIfAbsent(target, BHTAPI.INFO_FUNCTION);
+                Hurt capability = optional.orElseThrow(UnsupportedOperationException::new);
+                final AttackInfo attackInfo = capability.getMeleeMap().computeIfAbsent(target, BHTAPI.INFO_FUNCTION);
                 if (attackInfo.override) {
                     attackInfo.override = false;
                     return target.invulnerableDuration;
